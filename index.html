@@ -258,6 +258,64 @@ dialog .button { width: 100%; margin-top: 24px; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
 }
+
+/* A small dictionary entry welcomes first-time visitors into the same visual world. */
+.brand { border: 0; background: transparent; text-align: left; }
+.welcome-card { width: min(620px, calc(100vw - 32px)); padding: 0; border: 1px solid #54705b; border-radius: 20px; background: #f7f7ee; max-height: calc(100dvh - 32px); box-shadow: 0 24px 90px #142d294d; }
+.welcome-card[open] { animation: welcome-in .45s cubic-bezier(.16, 1, .3, 1) both; }
+.welcome-card::backdrop { background: #19362bd1; }
+.welcome-entry { background: #214d3c; color: #f5f5e9; padding: 20px 32px 28px; }
+.welcome-brand { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.welcome-brand > span { font-size: 20px; font-weight: 650; letter-spacing: -.04em; }
+.welcome-brand > span > span { font-weight: 400; }
+.welcome-brand .icon-button { color: #f5f5e9; margin-right: -12px; }
+.welcome-brand .icon-button:hover { background: #ffffff1a; }
+.welcome-brand .icon-button:focus-visible { outline-color: #dbe8bf; }
+.welcome-word-line { display: flex; align-items: baseline; gap: 24px; margin-top: 16px; flex-wrap: wrap; }
+.welcome-word { font: 96px/1.05 var(--serif); letter-spacing: -.04em; }
+.welcome-word > span { color: #c7d99f; }
+.welcome-pronunciation { color: #dbe8cf; font-size: 16px; }
+.welcome-definition { margin-top: 16px; font-size: 22px; line-height: 1.5; }
+.welcome-definition > span { color: #dbe8cf; font-size: 13px; margin-left: 8px; white-space: nowrap; }
+.welcome-definition > span::before { content: "· "; }
+.welcome-message { padding: 28px 32px 32px; }
+.welcome-message h2 { font: 32px/1.2 var(--serif); letter-spacing: -.02em; color: #234332; }
+.welcome-message > p { font-size: 14px; line-height: 1.8; color: #52634b; margin-top: 16px; }
+.welcome-actions { display: flex; align-items: center; gap: 24px; margin-top: 24px; flex-wrap: wrap; }
+.welcome-actions .button { width: auto; margin: 0; gap: 16px; }
+.welcome-actions .text-button { font-size: 13px; }
+body:has(.welcome-card[open]) { overflow: hidden; }
+@keyframes welcome-in {
+  from { opacity: .75; transform: translateY(16px) scale(.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@media (max-width: 480px) {
+  .welcome-entry { padding: 16px 24px 24px; }
+  .welcome-word-line { gap: 16px; margin-top: 20px; }
+  .welcome-word { font-size: 80px; }
+  .welcome-pronunciation { font-size: 14px; }
+  .welcome-definition { font-size: 20px; }
+  .welcome-definition > span { display: block; margin: 4px 0 0; }
+  .welcome-definition > span::before { content: none; }
+  .welcome-message { padding: 24px; }
+  .welcome-message h2 { font-size: 28px; }
+  .welcome-message > p { font-size: 13px; }
+  .welcome-message > p br { display: none; }
+  .welcome-actions { display: grid; gap: 8px; }
+  .welcome-actions .button { width: 100%; }
+}
+@media (max-height: 600px) and (min-width: 481px) {
+  .welcome-entry { padding-block: 12px 20px; }
+  .welcome-word { font-size: 64px; }
+  .welcome-word-line { margin-top: 0; }
+  .welcome-message { padding-block: 20px; }
+  .welcome-message h2 { font-size: 28px; }
+  .welcome-message h2 br { display: none; }
+  .welcome-actions { margin-top: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .welcome-card[open] { animation: none; }
+}
 </style><style>/* Reading keeps prose spacious and the annotation tools within reach. */
 .reading-filters { margin: 0 0 28px; }
 .reading-filters > span { font-size: 12px; }
@@ -355,7 +413,7 @@ dialog .button { width: 100%; margin-top: 24px; }
 <body>
   <a href="#main" id="skip-content" class="skip-link">К содержимому</a>
   <aside class="sidebar">
-    <a class="brand" href="#words" aria-label="English Space — словарь"><span class="brand-icon">e.</span><span>english<span class="brand-light">space</span></span></a>
+    <button class="brand" type="button" id="open-welcome" aria-label="Открыть приветствие English Space" title="О проекте English Space"><span class="brand-icon">e.</span><span>english<span class="brand-light">space</span></span></button>
 
     <nav aria-label="Основная навигация">
       <a href="#words" data-nav="words"><span data-icon="book"></span>Словарь<span class="nav-count" id="word-total">0</span></a>
@@ -371,6 +429,18 @@ dialog .button { width: 100%; margin-top: 24px; }
     <footer>Понемногу, каждый день.<span>ENGLISH SPACE · СЛОВА И ТЕКСТЫ</span></footer>
   </div>
   <div id="toast" role="status" aria-live="polite"></div>
+  <dialog id="welcome-dialog" class="welcome-card" aria-labelledby="welcome-title" aria-describedby="welcome-description">
+    <div class="welcome-entry">
+      <div class="welcome-brand"><span>english<span>space</span></span><button type="button" class="icon-button" id="welcome-close" aria-label="Закрыть приветствие"><span data-icon="close"></span></button></div>
+      <div class="welcome-word-line"><dfn class="welcome-word" lang="en">space<span aria-hidden="true">.</span></dfn><span class="welcome-pronunciation" lang="en">/speɪs/</span></div>
+      <p class="welcome-definition">пространство <span>существительное</span></p>
+    </div>
+    <div class="welcome-message">
+      <h2 id="welcome-title">Твоё пространство<br> для новых слов.</h2>
+      <p id="welcome-description">Вспоминай слова. Встречай их в текстах.<br> Возвращайся к тому, что хочется запомнить.</p>
+      <div class="welcome-actions"><button type="button" class="button primary" id="welcome-start" autofocus>Начать со слова <span data-icon="arrow"></span></button><button type="button" class="text-button" id="welcome-reading">Перейти к текстам</button></div>
+    </div>
+  </dialog>
   <dialog id="backup-dialog" aria-labelledby="backup-title"><div class="dialog-heading"><h2 id="backup-title">Перенос обучения</h2><button type="button" class="icon-button" id="backup-close" aria-label="Закрыть перенос"><span data-icon="close"></span></button></div><p id="backup-summary"></p><p class="muted">Существующие записи останутся. Для совпадающих слов и выделений применятся перевод и заметки из файла. Перед переносом сохраняется страховочная копия.</p><p id="backup-error" class="form-error" role="alert"></p><button class="button primary" id="backup-confirm">Объединить данные</button><button class="text-button" id="backup-cancel">Отмена</button></dialog>
   <dialog id="word-dialog" aria-labelledby="dialog-title">
     <form id="word-form">
@@ -698,7 +768,34 @@ document.addEventListener('submit',async event=>{
 $('#skip-content').addEventListener('click',event=>{event.preventDefault();$('#main').focus();$('#main').scrollIntoView({block:'start'});});
 $('#close-dialog').addEventListener('click',()=>$('#word-dialog').close());
 window.addEventListener('hashchange',()=>{render();window.scrollTo({top:0});});
-(async()=>{try{await refresh();render();}catch(error){$('#main').innerHTML=`<div class="panel empty-state"><h1>Не удалось открыть словарь</h1><p>${esc(error.message)}</p><p>Проверь, что приложение запущено, и обнови страницу.</p></div>`;}})();
+// The welcome card never changes learning data or resets a saved round.
+const welcomeDialog=$('#welcome-dialog');
+let welcomeReturnFocus=null,welcomeDestination=null;
+const welcomeKey='english-space-welcome-v1';
+function showWelcome(){
+  if(welcomeDialog.open||document.querySelector('dialog[open]'))return;
+  welcomeReturnFocus=document.activeElement;welcomeDestination=null;
+  welcomeDialog.showModal();
+}
+function showFirstWelcome(){
+  try{if(localStorage.getItem(welcomeKey)==='seen')return;}catch{}
+  showWelcome();
+}
+$('#open-welcome').addEventListener('click',showWelcome);
+$('#welcome-close').addEventListener('click',()=>welcomeDialog.close());
+$('#welcome-start').addEventListener('click',()=>{welcomeDestination='words';welcomeDialog.close();});
+$('#welcome-reading').addEventListener('click',()=>{welcomeDestination='reading';welcomeDialog.close();});
+welcomeDialog.addEventListener('close',()=>{
+  try{localStorage.setItem(welcomeKey,'seen');}catch{}
+  if(welcomeDestination){
+    const destination=welcomeDestination;welcomeDestination=null;
+    if(location.hash!==`#${destination}`)location.hash=destination;
+    window.scrollTo({top:0});$('#main').focus({preventScroll:true});
+  }else if(welcomeReturnFocus&&welcomeReturnFocus!==document.body&&welcomeReturnFocus.isConnected){
+    welcomeReturnFocus.focus({preventScroll:true});
+  }else $('#main').focus({preventScroll:true});
+});
+(async()=>{try{await refresh();render();showFirstWelcome();}catch(error){$('#main').innerHTML=`<div class="panel empty-state"><h1>Не удалось открыть словарь</h1><p>${esc(error.message)}</p><p>Проверь, что приложение запущено, и обнови страницу.</p></div>`;}})();
 </script><script>/* Export is available in both editions; browser edition also merges portable backups. */
 (() => {
   let pending=null;
@@ -730,4 +827,3 @@ window.addEventListener('hashchange',()=>{render();window.scrollTo({top:0});});
 })();
 </script></body>
 </html>
-
